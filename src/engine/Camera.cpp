@@ -3,6 +3,8 @@
 #include <vector>
 
 Camera::Camera() {
+    // Temporary world size setting
+    worldSize = {2000, 2000};
 }
 
 bool Camera::init(int width, int height) {
@@ -33,7 +35,7 @@ bool Camera::init(int width, int height) {
         return false;
     }
     // Create world texture (NOTE! Temporary size for now)
-    world = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 2*width, 2*height);
+    world = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, worldSize.first, worldSize.second);
     if (!world) {
         printf("Failed to create world texture. SDL Error: %s\n", SDL_GetError());
         return false;
@@ -63,7 +65,7 @@ void Camera::unsetFocusObject() {
 }
 
 /**
- * Set the x- any y-offset from the object in focus.
+ * Set the x- any y-offset from the object in focus (if any)
  */
 void Camera::setOffset(int dx, int dy) {
     offset.first = dx;
@@ -96,8 +98,14 @@ void Camera::updatePositionFromFocusObject() {
     int playerMiddleX = playerPos.first + playerSize.first / 2;
     int playerMiddleY = playerPos.second + playerSize.second / 2;
 
-    cameraRect.x = playerMiddleX - cameraRect.w / 2;
-    cameraRect.y = playerMiddleY - cameraRect.h / 2;
+    cameraRect.x = playerMiddleX - cameraRect.w / 2 - offset.first;
+    cameraRect.y = playerMiddleY - cameraRect.h / 2 - offset.second;
+
+    // Restrict camera to the world
+    cameraRect.x = std::max(cameraRect.x, 0);
+    cameraRect.x = std::min(cameraRect.x, worldSize.first - cameraRect.w);
+    cameraRect.y = std::max(cameraRect.y, 0);
+    cameraRect.y = std::min(cameraRect.y, worldSize.second - cameraRect.h);
 }
 
 /**
@@ -108,7 +116,7 @@ void Camera::render(std::vector<std::shared_ptr<RenderObject>>& renderObjects) {
     // Render objects onto world after clearing
     SDL_SetRenderTarget(renderer, world);
 
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0xAC, 0xDD, 0xE7, 0xFF);
     SDL_RenderClear(renderer);
 
     for (auto& obj: renderObjects) {
@@ -146,6 +154,5 @@ SDL_Texture* Camera::textureFromSurface(SDL_Surface* surface) {
 void Camera::update(std::vector<std::shared_ptr<RenderObject>>& renderObjects) {
     // Move camera to center on focus Object
     updatePositionFromFocusObject();
-    printf("Pos: %d, %d\n", cameraRect.x, cameraRect.y);
     render(renderObjects);
 }

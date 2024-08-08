@@ -39,6 +39,7 @@ class Camera {
         std::shared_ptr<RenderObject> objectInFocus;
         SDL_Rect cameraRect;
         std::pair<int, int> offset{0, 0};
+        std::pair<int, int> worldSize;
 
         void updatePositionFromFocusObject();
         void render(std::vector<std::shared_ptr<RenderObject>>& renderObjects);

@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
     engine.addObject(player);
     engine.addObject(decoration);
     engine.camera.setFocusObject(player);
+    engine.camera.setOffset(0, 100);
 
     engine.start();
     engine.quit();
