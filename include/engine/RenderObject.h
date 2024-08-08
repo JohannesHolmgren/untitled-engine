@@ -14,6 +14,7 @@ class RenderObject {
         virtual void update(State* state) = 0;
         void setPos(int x, int y);
         std::pair<int, int> getPos();
+        std::pair<int, int> getSize();
         virtual ~RenderObject();
         void setSprite(Sprite sprite);
 

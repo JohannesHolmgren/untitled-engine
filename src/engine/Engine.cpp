@@ -50,6 +50,7 @@ void Engine::quit() {
  */
 void Engine::start() {
     // Start program loop
+
     running = true;
     run();
 }
@@ -59,8 +60,8 @@ void Engine::stop() {
     running = false;
 }
 
-void Engine::addObject(std::unique_ptr<RenderObject> obj) {
-    renderObjects.push_back(std::move(obj));
+void Engine::addObject(std::shared_ptr<RenderObject> obj) {
+    renderObjects.push_back(obj);
 }
 
 Sprite Engine::loadSprite(std::string path, int scaleSize) {
@@ -117,7 +118,7 @@ void Engine::renderAll() {
         obj->render(renderer);
     } */
 
-   camera.render(renderObjects);
+   // camera.render(renderObjects);
 
     // Update screen
     // SDL_RenderPresent(renderer);
@@ -149,6 +150,7 @@ void Engine::run() {
         handleEvents();
         renderAll();
         updateAll();
+        camera.update(renderObjects);
         gameClock.update(60); // Pass FPS to restrict to
         state.setDeltaTime(gameClock.getDeltaTime()); // Transfer delta time to state
     }

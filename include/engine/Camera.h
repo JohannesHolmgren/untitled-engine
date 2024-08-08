@@ -36,22 +36,26 @@ class Camera {
         SDL_Window* window = nullptr;
         SDL_Renderer* renderer = nullptr;
         SDL_Texture* world = nullptr;
-        std::unique_ptr<RenderObject> objectInFocus;
+        std::shared_ptr<RenderObject> objectInFocus;
         SDL_Rect cameraRect;
         std::pair<int, int> offset{0, 0};
+
+        void updatePositionFromFocusObject();
+        void render(std::vector<std::shared_ptr<RenderObject>>& renderObjects);
 
     public:
         Camera();
         bool init(int width, int height);
         void quit();
-        void setFocusObject(RenderObject* obj);
+        void setFocusObject(std::shared_ptr<RenderObject> obj);
+        void unsetFocusObject();
         void setOffset(int dx, int dy);
         std::pair<int, int> getOffset();
         std::pair<int, int> getPosition();
         std::pair<int, int> getSize();
-        void render(std::vector<std::unique_ptr<RenderObject>>& renderObjects);
         SDL_Window* getWindow();
         SDL_Texture* textureFromSurface(SDL_Surface* surface);
+        void update(std::vector<std::shared_ptr<RenderObject>>& renderObjects);
 };
 
 

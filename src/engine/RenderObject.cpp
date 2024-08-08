@@ -54,6 +54,10 @@ std::pair<int, int> RenderObject::getPos() {
     return std::pair<int, int>(destRect.x, destRect.y);
 }
 
+std::pair<int, int> RenderObject::getSize() {
+    return std::pair<int, int>(destRect.w, destRect.h);
+}
+
 void RenderObject::setSprite(Sprite sprite) {
     this->sprite = sprite;
 }

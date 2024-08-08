@@ -45,8 +45,21 @@ bool Camera::init(int width, int height) {
 /**
  * Set the object for the camera to follow around
  */
-void Camera::setFocusObject(RenderObject* obj) {
-    objectInFocus = std::unique_ptr<RenderObject>(obj);
+void Camera::setFocusObject(std::shared_ptr<RenderObject> obj) {
+    if (obj) {
+        objectInFocus = std::move(obj);
+        printf("Position of object: %d, %d\n", objectInFocus->getPos().first, objectInFocus->getPos().second);
+    }
+    else {
+        printf("Couldn't set object in focus\n");
+    }
+}
+
+/**
+ * Remove focus for camera, making it stay in position
+ */
+void Camera::unsetFocusObject() {
+    objectInFocus = nullptr;
 }
 
 /**
@@ -74,13 +87,23 @@ std::pair<int, int> Camera::getPosition() {
 std::pair<int, int> Camera::getSize() {
     return std::pair<int, int>{cameraRect.w, cameraRect.h};
 }
+
+void Camera::updatePositionFromFocusObject() {
+    if (!objectInFocus) return;
+
+    std::pair<int, int> playerPos = objectInFocus->getPos();
+    std::pair<int, int> playerSize = objectInFocus->getSize();
+    int playerMiddleX = playerPos.first + playerSize.first / 2;
+    int playerMiddleY = playerPos.second + playerSize.second / 2;
+
+    cameraRect.x = playerMiddleX - cameraRect.w / 2;
+    cameraRect.y = playerMiddleY - cameraRect.h / 2;
+}
+
 /**
  * Render the world onto the window
  */
-void Camera::render(std::vector<std::unique_ptr<RenderObject>>& renderObjects) {
-    // Clear Screen
-    // SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    // SDL_RenderClear(renderer);
+void Camera::render(std::vector<std::shared_ptr<RenderObject>>& renderObjects) {
 
     // Render objects onto world after clearing
     SDL_SetRenderTarget(renderer, world);
@@ -118,4 +141,11 @@ SDL_Texture* Camera::textureFromSurface(SDL_Surface* surface) {
     SDL_Texture* newSpriteTexture;
     newSpriteTexture = SDL_CreateTextureFromSurface(renderer, surface);
     return newSpriteTexture;
+}
+
+void Camera::update(std::vector<std::shared_ptr<RenderObject>>& renderObjects) {
+    // Move camera to center on focus Object
+    updatePositionFromFocusObject();
+    printf("Pos: %d, %d\n", cameraRect.x, cameraRect.y);
+    render(renderObjects);
 }

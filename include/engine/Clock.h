@@ -9,6 +9,7 @@ class Clock {
         std::chrono::high_resolution_clock::time_point lastTimeStamp;
         float deltaTime;
         bool isFirstUpdate;
+        
 
     public:
         Clock();
