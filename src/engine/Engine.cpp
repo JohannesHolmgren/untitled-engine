@@ -20,29 +20,9 @@ bool Engine::init() {
         printf("Could not initialize. SDL Error: %s\n", SDL_GetError());
         return false;
     }
-    // Create window
-    window = SDL_CreateWindow(
-        "Untitled Engine",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT,
-        SDL_WINDOW_SHOWN
-    );
-    if (window == NULL) {
-        printf("Window could not be created. SDL Error: %s\n", SDL_GetError());
-        return false;
-    }
-    // Create renderer for window
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
-        printf("Renderer could not be created. SDL Error: %s\n", SDL_GetError());
-        return false;
-    }
-    // Initialize PNG loading
-    int imgFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imgFlags) & imgFlags)) {
-        printf("SDL_image could not be initialized. SDL_image error: %s\n", IMG_GetError());
-        return false;
-    }
+
+    // Initialize camera
+    camera.init(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
 
     printf("Program initiated successfully\n");
     return true;
@@ -56,9 +36,8 @@ void Engine::quit() {
 
     // Destroy renderer
 
-    // Destroy window
-    SDL_DestroyWindow(window);
-    window = NULL;
+    // Destroy camera (window)
+    camera.quit();
 
     // Quit SDL Subsystems
     SDL_Quit();
@@ -92,10 +71,9 @@ Sprite Engine::loadSprite(std::string path, int scaleSize) {
         return NULL;
     }
     // Convert surface to texture
-    SDL_Texture* newSpriteTexture;
-    newSpriteTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+    SDL_Texture* newSpriteTexture = camera.textureFromSurface(tmpSurface);
     if (newSpriteTexture == NULL) {
-        printf("Could not create texture from %s. SDL_image Error: %s\n", path.c_str(), IMG_GetError());
+        printf("Could not create texture. SDL_image Error: %s\n", IMG_GetError());
         return NULL;
     }
     // Get rid of old loaded surface
@@ -131,16 +109,18 @@ void Engine::handleEvents() {
  */
 void Engine::renderAll() {
     // Clear screen
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(renderer);
+    // SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    // SDL_RenderClear(renderer);
 
     // Render all objects TBD
-    for (auto& obj: renderObjects) {
+    /* for (auto& obj: renderObjects) {
         obj->render(renderer);
-    }
+    } */
+
+   camera.render(renderObjects);
 
     // Update screen
-    SDL_RenderPresent(renderer);
+    // SDL_RenderPresent(renderer);
 }
 
 /**

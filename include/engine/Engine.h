@@ -9,11 +9,12 @@
 #include "RenderObject.h"
 #include "Key.h"
 #include "Clock.h"
+#include "Camera.h"
 
 class Engine {
     private:
-        SDL_Window* window = nullptr;
-        SDL_Renderer* renderer = nullptr;
+        // SDL_Window* window = nullptr;
+        // SDL_Renderer* renderer = nullptr;
         const int DEFAULT_SCREEN_WIDTH = 1200;
         const int DEFAULT_SCREEN_HEIGHT = 800;
         bool running = false;
@@ -21,6 +22,7 @@ class Engine {
         std::vector<std::unique_ptr<RenderObject>> renderObjects;
         State state = State();
         Clock gameClock;
+        Camera camera;
 
     public:
         Engine();
