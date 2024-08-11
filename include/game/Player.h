@@ -12,6 +12,7 @@
 #include "State.h"
 #include "Key.h"
 #include "Animation.h"
+#include "Animator.h"
 
 class Player: public RenderObject {
     public:
@@ -22,6 +23,7 @@ class Player: public RenderObject {
         const float speed = 100;
         std::pair<float, float> pos;
         Animation animation;
+        Animator animator;
         void handleKeyInput(State* state);
         void moveToPos();
 };

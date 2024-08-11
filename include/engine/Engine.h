@@ -18,7 +18,6 @@ class Engine {
         const int DEFAULT_SCREEN_WIDTH = 1200;
         const int DEFAULT_SCREEN_HEIGHT = 800;
         bool running = false;
-        // std::vector<RenderObject> renderObjects;
         std::vector<std::shared_ptr<RenderObject>> renderObjects;
         State state = State();
         Clock gameClock;
@@ -32,10 +31,10 @@ class Engine {
         void stop();
         void addObject(std::shared_ptr<RenderObject> obj);
         Sprite loadSprite(std::string path, int scaleSize);
+        std::vector<Sprite> loadSpritesFromFolder(std::string path, int scaleSize);
 
     private:
         void handleEvents();
-        void renderAll();
         void updateAll();
         void run();
         void updateDeltaTime();

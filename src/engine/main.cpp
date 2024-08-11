@@ -13,12 +13,7 @@ int main(int argc, char* argv[]) {
 
     engine.init();
 
-
-    Sprite sprite0 = engine.loadSprite("assets/fish/swimming_0.png", 2);
-    Sprite sprite1 = engine.loadSprite("assets/fish/swimming_1.png", 2);
-    Sprite sprite2 = engine.loadSprite("assets/fish/swimming_2.png", 2);
-    Sprite sprite3 = engine.loadSprite("assets/fish/swimming_3.png", 2);
-    std::vector<Sprite> sprites{sprite0, sprite1, sprite2, sprite3};
+    std::vector<Sprite> sprites = engine.loadSpritesFromFolder("assets/player/walk/", 4);
     auto player = std::make_shared<Player>(sprites, 1000, 1000);
     auto decoration = std::make_shared<Decoration>(sprites, 1200, 1000);
     engine.addObject(player);

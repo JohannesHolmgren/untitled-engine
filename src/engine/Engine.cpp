@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include <iostream>
+#include <filesystem>
 #include "RenderObject.h"
 #include "Key.h"
 
@@ -69,17 +70,33 @@ Sprite Engine::loadSprite(std::string path, int scaleSize) {
     SDL_Surface* tmpSurface = IMG_Load(path.c_str());
     if (tmpSurface == NULL) {
         printf("Unable to load image %s. SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-        return NULL;
+        throw std::runtime_error("Unable to load image " + path + "SDL_image Error: " + IMG_GetError());
     }
     // Convert surface to texture
     SDL_Texture* newSpriteTexture = camera.textureFromSurface(tmpSurface);
     if (newSpriteTexture == NULL) {
         printf("Could not create texture. SDL_image Error: %s\n", IMG_GetError());
-        return NULL;
+        throw std::runtime_error("Unable to load image " + path + "SDL_image Error: " + IMG_GetError());
     }
     // Get rid of old loaded surface
     SDL_FreeSurface(tmpSurface);
     return Sprite(newSpriteTexture, scaleSize);
+}
+
+std::vector<Sprite> Engine::loadSpritesFromFolder(std::string path, int scaleSize) {
+    std::vector<Sprite> sprites;
+    try {
+        if(std::filesystem::exists(path) && std::filesystem::is_directory(path)) {
+            for (const auto& file : std::filesystem::directory_iterator(path)) {
+                Sprite sprite = loadSprite(file.path(), scaleSize);
+                sprites.push_back(sprite);
+            }
+        }
+    }
+    catch (const std::filesystem::filesystem_error& e) {
+        printf("Could not load sprites from directory %s\n. Filesystem error: %s", path.c_str(), e.what());
+    }
+    return sprites;
 }
 
 /* ======== Private methods ======== */
@@ -106,25 +123,6 @@ void Engine::handleEvents() {
 }
 
 /**
- * Render all objects to render and refresh window.
- */
-void Engine::renderAll() {
-    // Clear screen
-    // SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    // SDL_RenderClear(renderer);
-
-    // Render all objects TBD
-    /* for (auto& obj: renderObjects) {
-        obj->render(renderer);
-    } */
-
-   // camera.render(renderObjects);
-
-    // Update screen
-    // SDL_RenderPresent(renderer);
-}
-
-/**
  * Update all render objects
  */
 void Engine::updateAll() {
@@ -148,9 +146,8 @@ void Engine::run() {
     while (running) {
         updateDeltaTime();
         handleEvents();
-        renderAll();
         updateAll();
-        camera.update(renderObjects);
+        camera.update(renderObjects); // Renders everything
         gameClock.update(60); // Pass FPS to restrict to
         state.setDeltaTime(gameClock.getDeltaTime()); // Transfer delta time to state
     }
